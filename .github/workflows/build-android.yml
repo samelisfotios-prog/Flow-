@@ -1,0 +1,32 @@
+name: Build Android App Bundle
+
+on:
+  workflow_dispatch: # Allows you to manually trigger the build with a button click
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install Bubblewrap
+      run: npm install -g @bubblewrap/cli
+
+    - name: Initialize and Build PWA
+      run: |
+        # This tells the cloud runner to bypass prompts and auto-build your file
+        bubblewrap init --manifest=https://flowsocialmediaapp.lovable.app/manifest.json --yes
+        bubblewrap build --skipSigning
+
+    - name: Upload Google Play File
+      uses: actions/artifacts@v4
+      with:
+        name: play-store-bundle
+        path: ./*.aab
